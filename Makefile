@@ -1,5 +1,7 @@
 .DEFAULT_GOAL := help
 
+#fd
+
 PYTHONPATH=
 SHELL=/bin/bash
 VENV=.venv
