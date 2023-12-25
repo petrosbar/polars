@@ -177,6 +177,9 @@ class ListNameSpace:
     def sum(self) -> Series:
         """Sum all the arrays in the list."""
 
+    def product(self) -> Series:
+        """Compute the product of the arrays in the list."""
+
     def max(self) -> Series:
         """Compute the max value of the arrays in the list."""
 

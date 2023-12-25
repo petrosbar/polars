@@ -10,6 +10,7 @@ mod namespace;
 #[cfg(feature = "list_sets")]
 mod sets;
 mod sum_mean;
+mod product;
 #[cfg(feature = "list_to_struct")]
 mod to_struct;
 
