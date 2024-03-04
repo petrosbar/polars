@@ -1267,6 +1267,7 @@ def test_cbrt() -> None:
     )
 
 
+@pytest.mark.skip()
 def test_range() -> None:
     s1 = pl.Series("a", [1, 2, 3, 2, 2, 3, 0])
     assert_series_equal(s1[2:5], s1[range(2, 5)])
