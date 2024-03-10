@@ -27,6 +27,7 @@ def test_dtype() -> None:
     df = pl.DataFrame(
         data={
             "i": [[1, 2, 3]],
+            "li": [[[1, 2, 3]]],
             "u": [[u64_max]],
             "tm": [[time(10, 30, 45)]],
             "dt": [[date(2022, 12, 31)]],
@@ -34,6 +35,7 @@ def test_dtype() -> None:
         },
         schema=[
             ("i", pl.List(pl.Int8)),
+            ("li", pl.List(pl.List(pl.Int8))),
             ("u", pl.List(pl.UInt64)),
             ("tm", pl.List(pl.Time)),
             ("dt", pl.List(pl.Date)),
@@ -42,6 +44,7 @@ def test_dtype() -> None:
     )
     assert df.schema == {
         "i": pl.List(pl.Int8),
+        "li": pl.List(pl.List(pl.Int8)),
         "u": pl.List(pl.UInt64),
         "tm": pl.List(pl.Time),
         "dt": pl.List(pl.Date),
@@ -52,6 +55,7 @@ def test_dtype() -> None:
     assert df.rows() == [
         (
             [1, 2, 3],
+            [[1, 2, 3]],
             [u64_max],
             [time(10, 30, 45)],
             [date(2022, 12, 31)],
