@@ -603,17 +603,15 @@ def sequence_to_pyseries(
                 return PySeries.new_object(name, values, strict)
             if dtype:
                 if (inner_dtype := getattr(dtype, "inner", None)) is not None:
-                    srs = [
+                    py_srs = [
                         None
                         if value is None
                         else sequence_to_pyseries("", value, inner_dtype, strict=strict)
                         for value in values
                     ]
-                    to_cast = PySeries.new_series_list(name, srs, strict)
-                    if to_cast.dtype() != dtype:
-                        to_cast = to_cast.cast(dtype, strict=False)
-                    return to_cast
-                srs = sequence_from_any_value_and_dtype_or_object(name, values, dtype)
+                    srs = PySeries.new_series_list(name, py_srs, strict)
+                else:
+                    srs = sequence_from_any_value_and_dtype_or_object(name, values, dtype)
                 if dtype != srs.dtype():
                     srs = srs.cast(dtype, strict=False)
                 return srs
