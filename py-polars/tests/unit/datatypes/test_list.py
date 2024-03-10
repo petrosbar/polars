@@ -23,15 +23,18 @@ def test_dtype() -> None:
     assert a.dtype.is_(pl.List(pl.Int64))
 
     # explicit
+    u64_max = (2 ** 64) - 1
     df = pl.DataFrame(
         data={
             "i": [[1, 2, 3]],
+            "u": [[u64_max]],
             "tm": [[time(10, 30, 45)]],
             "dt": [[date(2022, 12, 31)]],
             "dtm": [[datetime(2022, 12, 31, 1, 2, 3)]],
         },
         schema=[
             ("i", pl.List(pl.Int8)),
+            ("u", pl.List(pl.UInt64)),
             ("tm", pl.List(pl.Time)),
             ("dt", pl.List(pl.Date)),
             ("dtm", pl.List(pl.Datetime)),
@@ -39,6 +42,7 @@ def test_dtype() -> None:
     )
     assert df.schema == {
         "i": pl.List(pl.Int8),
+        "u": pl.List(pl.UInt64),
         "tm": pl.List(pl.Time),
         "dt": pl.List(pl.Date),
         "dtm": pl.List(pl.Datetime),
@@ -48,6 +52,7 @@ def test_dtype() -> None:
     assert df.rows() == [
         (
             [1, 2, 3],
+            [u64_max],
             [time(10, 30, 45)],
             [date(2022, 12, 31)],
             [datetime(2022, 12, 31, 1, 2, 3)],

@@ -444,7 +444,6 @@ def sequence_to_pyseries(
 
     # lists defer to subsequent handling; identify nested type
     elif dtype == List:
-        getattr(dtype, "inner", None)
         python_dtype = list
 
     # infer temporal type handling
