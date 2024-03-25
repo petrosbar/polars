@@ -154,17 +154,21 @@ class LazyPolarsSlice:
         # straight-through mappings for "reverse"
         # and/or "gather_every"
         # ---------------------------------------
-        # [:]    => clone()
-        # [::k]  => gather_every(k),
-        # [::-1] => reverse(),
-        # [::-k] => reverse().gather_every(abs(k))
+        # [:]     => clone()
+        # [::k]   => gather_every(k),
+        # [0::-1] => head(1)
+        # [::-1]  => reverse(),
+        # [::-k]  => reverse().gather_every(abs(k))
         elif start == 0 and s.stop is None:
             if step == 1:
                 return self.obj.clone()
             elif step > 1:
                 return self.obj.gather_every(step)
             elif step == -1:
-                return self.obj.reverse()
+                if s.start == 0:
+                    return self.obj.head(1)
+                else:
+                    return self.obj.reverse()
             elif step < -1:
                 return self.obj.reverse().gather_every(abs(step))
 
