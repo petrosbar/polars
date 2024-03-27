@@ -8,7 +8,7 @@ from textwrap import dedent
 from typing import TYPE_CHECKING, Any, Collection, Sequence, overload
 
 from hypothesis.errors import InvalidArgument, NonInteractiveExampleWarning
-from hypothesis.strategies import booleans, composite, lists, sampled_from
+from hypothesis.strategies import booleans, composite, lists, sampled_from, randoms
 from hypothesis.strategies._internal.utils import defines_strategy
 
 from polars.dataframe import DataFrame
@@ -380,7 +380,7 @@ def series(
             )
             if strategy is None:
                 if series_dtype is Datetime or series_dtype is Duration:
-                    series_dtype = series_dtype(random.choice(_time_units))  # type: ignore[operator]
+                    series_dtype = series_dtype(draw(sampled_from(_time_units)))  # type: ignore[operator]
                 dtype_strategy = all_strategies[
                     series_dtype
                     if series_dtype in all_strategies
@@ -421,9 +421,10 @@ def series(
                 )
 
             # apply null values (custom frequency)
+            random_obj = draw(randoms(use_true_random=True))
             if null_probability and null_probability != 1:
                 for idx in range(series_size):
-                    if random.random() < null_probability:
+                    if random_obj.random() < null_probability:
                         series_values[idx] = None
 
             # init series with strategy-generated data

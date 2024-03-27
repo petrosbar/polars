@@ -128,14 +128,14 @@ def test_strategy_dtypes(
 
 @given(
     # set global, per-column, and overridden null-probabilities
-    s=series(size=50, null_probability=0.10),
-    df1=dataframes(cols=1, size=50, null_probability=0.30),
-    df2=dataframes(cols=2, size=50, null_probability={"col0": 0.70}),
+    s=series(size=50, null_probability=0.05),
+    df1=dataframes(cols=1, size=50, null_probability=0.40),
+    df2=dataframes(cols=2, size=50, null_probability={"col0": 0.80}),
     df3=dataframes(
         cols=1,
         size=50,
         null_probability=1.0,
-        include_cols=[column(name="colx", null_probability=0.20)],
+        include_cols=[column(name="colx", null_probability=0.30)],
     ),
 )
 @settings(max_examples=50)
