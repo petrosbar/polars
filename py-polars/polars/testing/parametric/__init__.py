@@ -9,6 +9,7 @@ if _HYPOTHESIS_AVAILABLE:
         all_strategies,
         create_array_strategy,
         create_list_strategy,
+        create_struct_strategy,
         nested_strategies,
         scalar_strategies,
     )
@@ -25,6 +26,7 @@ __all__ = [
     "columns",
     "create_array_strategy",
     "create_list_strategy",
+    "create_struct_strategy",
     "dataframes",
     "load_profile",
     "nested_strategies",

@@ -23,6 +23,7 @@ from hypothesis.strategies import (
     dates,
     datetimes,
     decimals,
+    fixed_dictionaries,
     floats,
     from_type,
     integers,
@@ -43,6 +44,7 @@ from polars.datatypes import (
     Datetime,
     Decimal,
     Duration,
+    Field,
     Float32,
     Float64,
     Int8,
@@ -51,6 +53,7 @@ from polars.datatypes import (
     Int64,
     List,
     String,
+    Struct,
     Time,
     UInt8,
     UInt16,
@@ -58,7 +61,7 @@ from polars.datatypes import (
     UInt64,
     is_polars_dtype,
 )
-from polars.type_aliases import PolarsDataType
+from polars.type_aliases import PolarsDataType, SchemaDict
 
 if TYPE_CHECKING:
     import sys
@@ -460,6 +463,14 @@ def create_list_strategy(
 
         if inner_dtype.inner is None and hasattr(st, "_dtype"):  # type: ignore[union-attr]
             inner_dtype = st._dtype
+
+    elif inner_dtype == Struct:
+        st = create_struct_strategy(
+            getattr(inner_dtype, "fields", None)
+        )
+        if getattr(inner_dtype, "fields", None) is None and hasattr(st, "_dtype"):
+            inner_dtype = st._dtype
+
     else:
         st = (
             sampled_from(list(select_from))
@@ -477,12 +488,42 @@ def create_list_strategy(
     return ls
 
 
-# TODO: strategy for Struct dtype.
-# def create_struct_strategy(
+def create_struct_strategy(
+    inner_dtype: Sequence[Field] | SchemaDict = None,
+    *,
+    num_fields: int | None = None,
+) -> SearchStrategy[dict[str, Any]]:
+    fields_list: list[Field] = []
+
+    if inner_dtype is None:
+        fields_list = [Field("a", String)]
+    else:
+        if isinstance(inner_dtype, Mapping):
+            fields_list = [Field(name, dtype) for name, dtype in inner_dtype.items()]
+        elif isinstance(inner_dtype, Sequence):
+            fields_list = list(inner_dtype)
+        else:
+            msg = "Invalid input type"
+            raise TypeError(msg)
+
+    schema = {}
+    for field in fields_list:
+        if field.dtype == Struct:
+            schema[field.name] = create_struct_strategy(field.dtype.fields)
+        elif field.dtype == List:
+            schema[field.name] = create_list_strategy(field.dtype.inner)
+        elif field.dtype == Array:
+            schema[field.name] = create_array_strategy(field.dtype.inner)
+        else:
+            schema[field.name] = scalar_strategies[field.dtype]
+
+    fdict_st = fixed_dictionaries(schema)
+    fdict_st._dtype = inner_dtype
+    return fdict_st
 
 
 nested_strategies[Array] = create_array_strategy
 nested_strategies[List] = create_list_strategy
-# nested_strategies[Struct] = create_struct_strategy(inner_dtype=None)
+nested_strategies[Struct] = create_struct_strategy
 
 all_strategies = scalar_strategies | nested_strategies
